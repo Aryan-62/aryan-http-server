@@ -1,7 +1,10 @@
+
+import os
 import socket
 
 SERVER_HOST = '0.0.0.0'
-SERVER_PORT = 8080
+SERVER_PORT = int(os.environ.get("PORT", 8080)) 
+
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -36,7 +39,7 @@ while True:
                 try:
                     with open('index.html', 'r') as fin:
                         content = fin.read()
-                    response = 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n' + content
+                   
                 except FileNotFoundError:
                     response = 'HTTP/1.1 404 Not Found\r\n\r\n<h1>404 - index.html not found</h1>'
                     
@@ -44,7 +47,9 @@ while True:
                 try:
                     with open('book.json', 'r') as fin:
                         content = fin.read()
-                    response = 'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n' + content
+                  
+                    response = 'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\n\r\n' + content
+
                 except FileNotFoundError:
                     response = 'HTTP/1.1 404 Not Found\r\n\r\n{"error": "book.json not found"}'
                     
