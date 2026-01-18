@@ -7,13 +7,12 @@ from datetime import datetime
 from urllib.parse import parse_qs, urlparse
 import logging
 
-# Configure logging
+# Configure logging (NO file logging for deployment)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('server.log', encoding='utf-8'),
-        logging.StreamHandler()
+        logging.StreamHandler()  # Only console logging
     ]
 )
 
@@ -221,12 +220,12 @@ class HTTPServer:
         response_str = '\r\n'.join(response_lines)
         client_socket.sendall(response_str.encode('utf-8'))
         
-    # ============ Route Handlers ============
+    
     
     def serve_index(self, request):
         """Serve index.html"""
         try:
-            with open('index.html', 'r') as f:
+            with open('index.html', 'r', encoding='utf-8') as f:
                 content = f.read()
             return self._create_response(200, content)
         except FileNotFoundError:
@@ -235,7 +234,7 @@ class HTTPServer:
     def serve_book(self, request):
         """Serve book.json"""
         try:
-            with open('book.json', 'r') as f:
+            with open('book.json', 'r', encoding='utf-8') as f:
                 content = f.read()
             return self._create_response(200, content, content_type='application/json')
         except FileNotFoundError:
@@ -260,13 +259,13 @@ class HTTPServer:
             data = json.loads(body) if body else {}
             
             # Validate and update book.json
-            with open('book.json', 'r') as f:
+            with open('book.json', 'r', encoding='utf-8') as f:
                 current_book = json.load(f)
             
             # Merge updates
             current_book.update(data)
             
-            with open('book.json', 'w') as f:
+            with open('book.json', 'w', encoding='utf-8') as f:
                 json.dump(current_book, f, indent=2)
             
             return self._create_response(200, json.dumps({
@@ -295,8 +294,8 @@ class HTTPServer:
             content_type = content_type or 'application/octet-stream'
             
             # Read file
-            with open(file_path, 'rb') as f:
-                content = f.read().decode('utf-8')
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
             
             return self._create_response(200, content, content_type=content_type)
             
@@ -312,8 +311,9 @@ class HTTPServer:
         <head>
             <title>404 - Not Found</title>
             <style>
-                body { font-family: Arial; text-align: center; padding: 50px; }
+                body { font-family: Arial; text-align: center; padding: 50px; background: #0a0e27; color: #e4e4e7; }
                 h1 { color: #e74c3c; }
+                a { color: #3b82f6; text-decoration: none; }
             </style>
         </head>
         <body>
@@ -324,7 +324,6 @@ class HTTPServer:
         </html>
         """
 
-# ============ Middleware Examples ============
 
 def logging_middleware(request):
     """Log all incoming requests"""
@@ -333,13 +332,14 @@ def logging_middleware(request):
 
 def cors_middleware(request):
     """Add CORS headers"""
-    # This would be applied to the response in a more complete implementation
     return request
 
-# ============ Main ============
 
 if __name__ == '__main__':
-    server = HTTPServer(host='0.0.0.0', port=8080, max_connections=10)
+   
+    port = int(os.environ.get("PORT", 8080))
+    
+    server = HTTPServer(host='0.0.0.0', port=port, max_connections=10)
     
     # Add middleware
     server.use(logging_middleware)
