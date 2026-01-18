@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AryanHTTP Server - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e27;
+            color: #e4e4e7;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        /* Header */
+        header {
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .subtitle {
+            color: #9ca3af;
+            font-size: 1.1em;
+        }
+        
+        .badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 6px 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: #94a3b8;
+        }
+        
+        /* Stats Grid */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: #475569;
+        }
+        
+        .stat-label {
+            font-size: 0.875em;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        /* Main Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .card h2 {
+            font-size: 1.25em;
+            margin-bottom: 20px;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        /* Terminal */
+        .terminal {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+        
+        .terminal-line {
+            margin-bottom: 4px;
+        }
+        
+        .terminal-time {
+            color: #64748b;
+        }
+        
+        .terminal-success {
+            color: #10b981;
+        }
+        
+        .terminal-error {
+            color: #ef4444;
+        }
+        
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875em;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #6366f1;
+        }
+        
+        .btn-secondary:hover {
+            background: #4f46e5;
+        }
+        
+        /* API List */
+        .api-list {
+            list-style: none;
+        }
+        
+        .api-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #0f172a;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+        }
+        
+        .method {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75em;
+            margin-right: 12px;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .method-get {
+            background: #1e40af;
+            color: #dbeafe;
+        }
+        
+        .method-post {
+            background: #15803d;
+            color: #dcfce7;
+        }
+        
+        .path {
+            color: #e4e4e7;
+            flex: 1;
+        }
+        
+        /* Output Box */
+        .output {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875em;
+            min-height: 150px;
+            color: #94a3b8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        /* Features List */
+        .features {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .features h2 {
+            font-size: 1.25em;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature {
+            padding: 16px;
+            background: #0f172a;
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        
+        .feature-desc {
+            font-size: 0.875em;
+            color: #94a3b8;
+        }
+        
+        /* Status Indicator */
+        .status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AryanHTTP Server</h1>
+            <p class="subtitle">Custom HTTP/1.1 Server</p>
+            <span class="badge">Python | Socket Programming | Multi-threaded</span>
+        </header>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Server Status</div>
+                <div class="stat-value"><span class="status"></span>Online</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Threads</div>
+                <div class="stat-value" id="threads">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Requests</div>
+                <div class="stat-value" id="requests">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Uptime</div>
+                <div class="stat-value" id="uptime">0:00:00</div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h2>Server Control</h2>
+                <div class="btn-group">
+                    <button class="btn" onclick="refreshStats()">Refresh Stats</button>
+                    <button class="btn btn-secondary" onclick="runBenchmark()">Run Benchmark</button>
+                </div>
+                <div class="output" id="output">Waiting for commands...</div>
+            </div>
+            
+            <div class="card">
+                <h2>API Testing</h2>
+                <div class="btn-group">
+                    <button class="btn" onclick="testGet()">GET /book</button>
+                    <button class="btn" onclick="testPost()">POST Update</button>
+                    <button class="btn btn-secondary" onclick="test404()">Test 404</button>
+                </div>
+                <div class="terminal" id="terminal">
+                    <div class="terminal-line">System ready. Server online at http://localhost:8080</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Available Endpoints</h2>
+            <ul class="api-list">
+                <li class="api-item">
+                    <span class="method method-get">GET</span>
+                    <span class="path">/</span>
+                    <span style="color: #64748b; margin-left: auto;">Dashboard</span>
+                </li>
+                <li class="api-item">
+                    <span class="method method-get">GET</span>
+                    <span class="path">/book</span>
+                    <span style="color: #64748b; margin-left: auto;">Book data (JSON)</span>
+                </li>
+                <li class="api-item">
+                    <span class="method method-get">GET</span>
+                    <span class="path">/api/stats</span>
+                    <span style="color: #64748b; margin-left: auto;">Server statistics</span>
+                </li>
+                <li class="api-item">
+                    <span class="method method-post">POST</span>
+                    <span class="path">/api/book</span>
+                    <span style="color: #64748b; margin-left: auto;">Update book data</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="features">
+            <h2>Technical Implementation</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="feature-title">Multi-threading</div>
+                    <div class="feature-desc">Concurrent request handling with thread pool</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-title">HTTP/1.1 Protocol</div>
+                    <div class="feature-desc">Complete implementation from TCP sockets</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-title">RESTful Routing</div>
+                    <div class="feature-desc">Dynamic route registration system</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-title">Request Parser</div>
+                    <div class="feature-desc">Headers, query params, and body parsing</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-title">Error Handling</div>
+                    <div class="feature-desc">Custom 404/500 pages with logging</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-title">Middleware Pipeline</div>
+                    <div class="feature-desc">Extensible request/response interception</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let requestCount = 0;
+        let startTime = Date.now();
+        
+        function log(message, type = 'info') {
+            const terminal = document.getElementById('terminal');
+            const time = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'terminal-success' : type === 'error' ? 'terminal-error' : '';
+            terminal.innerHTML += `\n<div class="terminal-line"><span class="terminal-time">[${time}]</span> <span class="${className}">${message}</span></div>`;
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+        
+        function updateOutput(text) {
+            document.getElementById('output').textContent = text;
+        }
+        
+        async function refreshStats() {
+            log('Fetching server statistics...');
+            const start = performance.now();
+            
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                const time = Math.round(performance.now() - start);
+                
+                document.getElementById('threads').textContent = data.active_threads;
+                requestCount++;
+                document.getElementById('requests').textContent = requestCount;
+                
+                updateOutput(JSON.stringify(data, null, 2));
+                log(`Stats retrieved successfully (${time}ms)`, 'success');
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                updateOutput(`Error: ${error.message}`);
+            }
+        }
+        
+        async function testGet() {
+            log('Testing GET /book...');
+            const start = performance.now();
+            
+            try {
+                const response = await fetch('/book');
+                const data = await response.json();
+                const time = Math.round(performance.now() - start);
+                
+                requestCount++;
+                document.getElementById('requests').textContent = requestCount;
+                
+                updateOutput(JSON.stringify(data, null, 2));
+                log(`GET /book - 200 OK (${time}ms)`, 'success');
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testPost() {
+            log('Testing POST /api/book...');
+            
+            try {
+                const update = {
+                    available: Math.random() > 0.5,
+                    lastChecked: new Date().toISOString()
+                };
+                
+                const response = await fetch('/api/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(update)
+                });
+                
+                const data = await response.json();
+                requestCount++;
+                document.getElementById('requests').textContent = requestCount;
+                
+                updateOutput(JSON.stringify(data, null, 2));
+                log('POST /api/book - 200 OK', 'success');
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function test404() {
+            log('Testing 404 error handling...');
+            
+            try {
+                const response = await fetch('/nonexistent');
+                requestCount++;
+                document.getElementById('requests').textContent = requestCount;
+                
+                if (response.status === 404) {
+                    log('404 handler working correctly', 'success');
+                    updateOutput('404 Not Found - Custom error page served');
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runBenchmark() {
+            log('Running performance benchmark (10 requests)...');
+            updateOutput('Benchmark running...');
+            
+            const times = [];
+            for (let i = 0; i < 10; i++) {
+                const start = performance.now();
+                try {
+                    await fetch('/api/stats');
+                    times.push(performance.now() - start);
+                    requestCount++;
+                } catch (error) {
+                    log(`Request ${i + 1} failed`, 'error');
+                }
+            }
+            
+            const avg = (times.reduce((a, b) => a + b, 0) / times.length).toFixed(2);
+            const min = Math.min(...times).toFixed(2);
+            const max = Math.max(...times).toFixed(2);
+            
+            document.getElementById('requests').textContent = requestCount;
+            
+            const result = `Benchmark Results (10 requests):
+Average: ${avg}ms
+Min: ${min}ms
+Max: ${max}ms
+Throughput: ${(1000 / avg).toFixed(0)} req/s`;
+            
+            updateOutput(result);
+            log('Benchmark complete', 'success');
+        }
+        
+        // Update uptime
+        setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            document.getElementById('uptime').textContent = 
+                `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+        
+        // Auto-refresh stats every 10 seconds
+        setInterval(refreshStats, 10000);
+        
+        // Initial load
+        window.addEventListener('load', () => {
+            refreshStats();
+            log('Dashboard initialized', 'success');
+        });
+    </script>
+</body>
+</html>
